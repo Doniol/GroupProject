@@ -2,6 +2,7 @@
 #include <stdio.h>      // for printf
 #include <unistd.h>     // for usleep
 #include <signal.h>     // for catching exit signals
+#include <iostream>
 
 using namespace std;
 
@@ -17,8 +18,8 @@ int main(){
   BP.set_motor_limits(PORT_C, 60, 0);
   
   int error;
-  int color = 200;
-  int light = 100;
+  int color = 300;
+  int light = 2600;
   
   BP.set_sensor_type(PORT_1, SENSOR_TYPE_NXT_COLOR_FULL);
   BP.set_sensor_type(PORT_3, SENSOR_TYPE_NXT_LIGHT_ON);
@@ -27,48 +28,33 @@ int main(){
   sensor_light_t      Light3;
 
   while(true){
-    error = 0;
-
-    if(color > 200 && light < 2500){
-      BP.set_motor_power(PORT_B, 25);
-      BP.set_motor_power(PORT_C, 25);
-      usleep(200000);
-      BP.set_motor_power(PORT_B, 0);
-      BP.set_motor_power(PORT_C, 0);
-    } else if(color < 200){
+    BP.set_motor_power(PORT_B, 25);
+    BP.set_motor_power(PORT_C, 25);
+    while(true){
+      if(BP.get_sensor(PORT_1, &Color1)){
+        cout << Color1.reflected_green << " - " << Light3.reflected << " Straight\n";
+      } else {
+        if(BP.get_sensor(PORT_3, &Light3)){
+          cout << Color1.reflected_green << " - " << Light3.reflected << " Straight\n";
+        } else {
+          cout << Color1.reflected_green << " - " << Light3.reflected << " Straight\n";
+          if((Color1.reflected_green < 200) != (Light3.reflected > 2500)){
+            color = Color1.reflected_green;
+            light = Light3.reflected;
+            break;
+          }
+        }
+      }
+    }
+    if(color < 200){
       BP.set_motor_power(PORT_B, -25);
       BP.set_motor_power(PORT_C, 25);
-      usleep(200000);
-      BP.set_motor_power(PORT_B, 0);
-      BP.set_motor_power(PORT_C, 0);
-    } else if(light > 2500){
+      usleep(20000);
+    } else if( light > 2500){
       BP.set_motor_power(PORT_B, 25);
       BP.set_motor_power(PORT_C, -25);
-      usleep(200000);
-      BP.set_motor_power(PORT_B, 0);
-      BP.set_motor_power(PORT_C, 0);
-    }    
-
-    if(BP.get_sensor(PORT_1, &Color1)){
-      error++;
-    }else{
-      printf("Color sensor (S1): detected %d red %4d green %4d blue %4d ambient %4d\n", Color1.color, Color1.reflected_red, Color1.reflected_green, Color1.reflected_blue, Color1.ambient);
-      color = Color1.reflected_green;
+      usleep(20000);
     }
-    
-    if(BP.get_sensor(PORT_3, &Light3)){
-      error++;
-    }else{
-      printf("Light sensor (S3): reflected %4d   ", Light3.reflected);
-      light = Light3.reflected;
-    }
-    
-    if(error == 2){
-      printf("Waiting for sensors to be configured");
-    }
-    
-    printf("\n\n");
-    usleep(200000);
   }
 }
 
