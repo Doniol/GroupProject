@@ -43,23 +43,30 @@ int main(){
         distance = Ultrasonic4.cm;
         command = 1;
         break;
-      } else if((Color1.reflected_green < 200) != (Light3.reflected > 2500)){
+      } else if((Color1.reflected_green < 300) != (Light3.reflected > 2300)){
         color = Color1.reflected_green;
         light = Light3.reflected;
         command = 2;
         break;
+      } else if((Color1.reflected_green < 300) && (Light3.reflected > 2300)){
+        color = Color1.reflected_green;
+        light = Light3.reflected;
+        command = 3;
+        break;
       }
     }
-    BP.set_motor_power(PORT_B, 0);
-    BP.set_motor_power(PORT_C, 0);
-    if(color < 200 && command == 2){
+    if(color < 300 && command == 2){
       BP.set_motor_power(PORT_B, -25);
       BP.set_motor_power(PORT_C, 25);
       usleep(20000);
-    } else if(light > 2500 && command == 2){
+    } else if(light > 2300 && command == 2){
       BP.set_motor_power(PORT_B, 25);
       BP.set_motor_power(PORT_C, -25);
       usleep(20000);
+    } else if(command == 3){
+      BP.set_motor_power(PORT_B, 25);
+      BP.set_motor_power(PORT_C, 25);
+      usleep(200000);
     } else if(distance < 20 && distance > 0.1 && command == 1){
       BP.set_motor_position_relative(PORT_B, 600);
       BP.set_motor_position_relative(PORT_C, -600);
@@ -134,7 +141,7 @@ int main(){
       BP.set_motor_position_relative(PORT_D, -400);
       usleep(2000000);
       cout << distance << " Third Check \n";
-      while(distance < 30){
+      while(distance < 25){
 	BP.set_motor_power(PORT_B, 25);
         BP.set_motor_power(PORT_C, 25);
         usleep(1000000);
@@ -156,19 +163,6 @@ int main(){
       usleep(1000000);
       BP.set_motor_power(PORT_B, 0);
       BP.set_motor_power(PORT_C, 0);
-      while(true){
-        BP.get_sensor(PORT_1, &Color1);
-        color = Color1.reflected_green;
-        cout << color << " Green \n";
-        if(color < 200){
-          BP.set_motor_power(PORT_B, 0);
-          BP.set_motor_power(PORT_C, 0);
-          break;
-        } else {
-          BP.set_motor_power(PORT_B, 25);
-          BP.set_motor_power(PORT_C, 25);
-        }
-      }
     }
   }
 }
