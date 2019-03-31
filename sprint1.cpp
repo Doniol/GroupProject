@@ -105,14 +105,22 @@ int main(){
 			usleep(1500000);
 			BP.set_motor_power(PORT_B, 0);
 			BP.set_motor_power(PORT_C, 0);
-			BP.set_motor_position_relative(PORT_B, -600); // Third turn. turn 90 degrees and continue driving forward until the line is found, then follow the regular set of instructions
+			BP.set_motor_position_relative(PORT_B, -600); // Third turn. Turn 90 degrees and continue driving forward until the line is found, turn right and then follow the regular set of instructions
 			BP.set_motor_position_relative(PORT_C, 600);
 			usleep(2000000);
 			BP.set_motor_power(PORT_B, 25);
 			BP.set_motor_power(PORT_C, 25);
-			usleep(2000000);
+			BP.get_sensor(PORT_3, &Light3);// Get data from light sensor
+			light = Light3.reflected;
+			while(light < 2300){
+				BP.get_sensor(PORT_3, &Light3);// Get data from light sensor
+				light = Light3.reflected;
+			}
 			BP.set_motor_power(PORT_B, 0);
 			BP.set_motor_power(PORT_C, 0);
+			BP.set_motor_position_relative(PORT_B, 200);
+			BP.set_motor_position_relative(PORT_C, -200);
+			usleep(2000000);
 		}
 	}
 }
