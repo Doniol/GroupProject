@@ -100,7 +100,7 @@ int main(){
 					int green = intensity.val[1];
 					int red = intensity.val[2];
 					cout << blue << " blue " << green << " green " << red << " red\n";
-					if(red > blue && red > green){
+					if(red > blue && red > green){ // Compare gained values from pixel to determine color and add +1 to according variable
 						redval++;
 					} else if(blue > red && blue > green){
 						blueval++;
@@ -109,24 +109,26 @@ int main(){
 					}
 				}
 			}
-			if(redval > (6 * greenval) && redval > blueval){
+			// Compare amount of red, blue and green in the image to determine color of cup and add according amount of balls/sugar cubes
+			// We used (6 * greenval) instead of just greenval because in the greentints tested by us there was a large amount of red for each bit of green, this was put in place to balance this out
+			if(redval > (6 * greenval) && redval > blueval && sugar >= 1){
 				cout << "Color is Red: " << blueval << " blue " << greenval << " green " << redval << " red\n";
-				BP.offset_motor_encoder(PORT_D, BP.get_motor_encoder(PORT_D));
+				BP.offset_motor_encoder(PORT_D, BP.get_motor_encoder(PORT_D)); // Rotate motor once to push out 1 ball/sugar cube
 				BP.set_motor_position(PORT_D, 360);
 				usleep(2000000);
-				sugar--;
-			} else if(blueval > greenval && blueval > redval){
+				sugar--; // Update remaining amount of balls/sugar cubes
+			} else if(blueval > greenval && blueval > redval && sugar >= 2){
 				cout << "Color is Blue: " << blueval << " blue " << greenval << " green " << redval << " red\n";
-				BP.offset_motor_encoder(PORT_D, BP.get_motor_encoder(PORT_D));
+				BP.offset_motor_encoder(PORT_D, BP.get_motor_encoder(PORT_D)); // Rotate motor twice
 				BP.set_motor_position(PORT_D, 360);
 				usleep(2000000);
 				BP.offset_motor_encoder(PORT_D, BP.get_motor_encoder(PORT_D));
 				BP.set_motor_position(PORT_D, 360);
 				usleep(2000000);
 				sugar -= 2;
-			} else if((6 * greenval) > redval && greenval > blueval){
+			} else if((6 * greenval) > redval && greenval > blueval && sugar >= 3){
 				cout << "Color is Green: " << blueval << " blue " << greenval << " green " << redval << " red\n";
-				BP.offset_motor_encoder(PORT_D, BP.get_motor_encoder(PORT_D));
+				BP.offset_motor_encoder(PORT_D, BP.get_motor_encoder(PORT_D)); // Rotate motor thrice
 				BP.set_motor_position(PORT_D, 360);
 				usleep(2000000);
 				BP.offset_motor_encoder(PORT_D, BP.get_motor_encoder(PORT_D));
@@ -139,12 +141,12 @@ int main(){
 			} else {
 				cout << "Unrecognized color or no balls/sugar cubes left!!\n";
 			}
-			BP.set_motor_power(PORT_B, 25);
+			BP.set_motor_power(PORT_B, 25); // Turn on motors for a moment to reposition the ultrasonic sensor so it doesnt detect the same cup that was just filled
 			BP.set_motor_power(PORT_C, 25);
 			usleep(2000000);
 		}
 	}
-	BP.reset_all();
+	BP.reset_all(); // Reset everything
 }
 
 // Signal handler that will be called when Ctrl+C is pressed to stop the program
