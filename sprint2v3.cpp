@@ -45,7 +45,7 @@ int main(){
 	while(true){
 		BP.set_motor_power(PORT_B, 25); // Set basic robot speed
 		BP.set_motor_power(PORT_C, 25);
-		while(true){
+		while(command == 0){
 			BP.get_sensor(PORT_2, &Ultrasonic2);// Get data from ultrasonic sensor
 			BP.get_sensor(PORT_3, &Color);	// Get data from color sensor
 			BP.get_sensor(PORT_4, &Light4);// Get data from light sensor
@@ -53,39 +53,38 @@ int main(){
 			if(Ultrasonic2.cm < 10 && Ultrasonic2.cm > 0.1){ // Compare data from sensor with predetermined values
 				distance = Ultrasonic2.cm; // Assign gained data to variable for later use
 				command = 1; // Distance
-				break;
 			}
 			else if(((Color.reflected_red + Color.reflected_green + Color.reflected_blue) / 3 < 300) != (Light4.reflected > 2300)){ // If either the right or left sensor sees the black line
 				color = (Color.reflected_red + Color.reflected_green + Color.reflected_blue) / 3;
 				light = Light4.reflected;
 				command = 2;	// Left and right
-				break;
 			}
-			else if(((Color.reflected_red + Color.reflected_green + Color.reflected_blue) / 3 < 300) && (Light4.reflected > 2300)){ // If both the right and left sensors see a black line
+			else if(((Color.reflected_red + Color.reflected_green + Color.reflected_blue) / 3 < 300) && ((Color.reflected_red + Color.reflected_green + Color.reflected_blue) / 3 > 1) && (Light4.reflected > 2300)){ // If both the right and left sensors see a black line
 				color = (Color.reflected_red + Color.reflected_green + Color.reflected_blue) / 3;
 				light = Light4.reflected;
 				command = 3;	// Crossroad
-				break;
 			}
 		}
 		if(color < 300 && command == 2){ // Left
 			BP.set_motor_power(PORT_B, -25);
 			BP.set_motor_power(PORT_C, 25);
 			usleep(20000);
+			command = 0;
 		}
 		else if(light > 2300 && command == 2){ // Right
 			BP.set_motor_power(PORT_B, 25);
 			BP.set_motor_power(PORT_C, -25);
 			usleep(20000);
+			command = 0;
 		}
 		else if(command == 3){ // Stop at crossroad
 			BP.set_motor_power(PORT_B, 0);
 			BP.set_motor_power(PORT_C, 0);
+			command = 0;
 			break;
-			
 		}
 		else if(command == 1){
-			usleep(1300000); // Continue driving for a moment to position robot in front of cup
+			usleep(1200000); // Continue driving for a moment to position robot in front of cup
 			BP.set_motor_power(PORT_B, 0);
 			BP.set_motor_power(PORT_C, 0);
 			system("fswebcam --no-banner /home/pi/Desktop/Project/image.jpg"); // Take a picture with the camera
@@ -141,9 +140,7 @@ int main(){
 			} else {
 				cout << "Unrecognized color or no balls/sugar cubes left!!\n";
 			}
-			BP.set_motor_power(PORT_B, 25); // Turn on motors for a moment to reposition the ultrasonic sensor so it doesnt detect the same cup that was just filled
-			BP.set_motor_power(PORT_C, 25);
-			usleep(2000000);
+			command = 0;
 		}
 	}
 	BP.reset_all(); // Reset everything
