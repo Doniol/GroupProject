@@ -45,7 +45,7 @@ int main(){
 	while(true){
 		BP.set_motor_power(PORT_B, 25); // Set basic robot speed
 		BP.set_motor_power(PORT_C, 25);
-		while(command == 0){
+		while(command == 0){ // Check data from sensors and analyze it; Rick & Noah
 			BP.get_sensor(PORT_2, &Ultrasonic2);// Get data from ultrasonic sensor
 			BP.get_sensor(PORT_3, &Color);	// Get data from color sensor
 			BP.get_sensor(PORT_4, &Light4);// Get data from light sensor
@@ -64,7 +64,7 @@ int main(){
 				light = Light4.reflected;
 				command = 3;	// Crossroad
 			}
-		}
+		} // Move according to gained data; Rick & Noah
 		if(color < 300 && command == 2){ // Left
 			BP.set_motor_power(PORT_B, -25);
 			BP.set_motor_power(PORT_C, 25);
@@ -83,7 +83,7 @@ int main(){
 			command = 0;
 			break;
 		}
-		else if(command == 1){
+		else if(command == 1){ // Camera; Daniel
 			usleep(1200000); // Continue driving for a moment to position robot in front of cup
 			BP.set_motor_power(PORT_B, 0);
 			BP.set_motor_power(PORT_C, 0);
@@ -108,7 +108,7 @@ int main(){
 					}
 				}
 			}
-			// Compare amount of red, blue and green in the image to determine color of cup and add according amount of balls/sugar cubes
+			// Compare amount of red, blue and green in the image to determine color of cup and add according amount of balls/sugar cubes; Peter
 			// We used (6 * greenval) instead of just greenval because in the greentints tested by us there was a large amount of red for each bit of green, this was put in place to balance this out
 			if(redval > (6 * greenval) && redval > blueval && sugar >= 1){
 				cout << "Color is Red: " << blueval << " blue " << greenval << " green " << redval << " red\n";
@@ -146,7 +146,7 @@ int main(){
 	BP.reset_all(); // Reset everything
 }
 
-// Signal handler that will be called when Ctrl+C is pressed to stop the program
+// Signal handler that will be called when Ctrl+C is pressed to stop the program; Rick & Noah
 void exit_signal_handler(int signo){
 	if(signo == SIGINT){
 		BP.reset_all();    // Reset everything so there are no run-away motors
